@@ -1,0 +1,30 @@
+{
+  "name": "vue2-source",
+  "version": "1.0.0",
+  "description": "vue2源码学习",
+  "main": "index.js",
+  "type": "module",
+  "engines": {
+    "node": ">=20.12.1"
+  },
+  "scripts": {
+    "dev": "rollup -c -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xxld0125/vue2-source.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xxld0125/vue2-source/issues"
+  },
+  "homepage": "https://github.com/xxld0125/vue2-source#readme",
+  "devDependencies": {
+    "@babel/core": "^7.26.10",
+    "@babel/preset-env": "^7.26.9",
+    "rollup": "^4.40.0",
+    "rollup-plugin-babel": "^4.4.0"
+  }
+}
