@@ -1,0 +1,51 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+# Vue2源码学习开发指南
+
+本规则提供了在此项目中开发和学习Vue2源码的指导。
+
+## 环境要求
+
+- Node.js: v20.12.1 (建议使用nvm管理版本，见[.nvmrc](mdc:.nvmrc))
+- 包管理工具: pnpm
+
+## 开发流程
+
+1. 初始化项目
+   ```bash
+   pnpm install
+   ```
+
+2. 启动开发环境
+   ```bash
+   pnpm dev
+   ```
+
+3. 构建输出在[dist](mdc:dist)目录中
+
+## 代码规范
+
+项目遵循以下代码规范：
+- 使用ES模块规范
+- 函数和类使用单一职责原则
+- 代码风格遵循[.editorconfig](mdc:.editorconfig)配置
+
+## 学习路径
+
+推荐的学习路径：
+
+1. 从[src/index.js](mdc:src/index.js)开始，了解Vue构造函数
+2. 学习[src/init.js](mdc:src/init.js)中的实例初始化过程
+3. 理解[src/state.js](mdc:src/state.js)中的状态初始化
+4. 深入[src/observe/index.js](mdc:src/observe/index.js)学习响应式原理
+5. 学习[src/observe/array.js](mdc:src/observe/array.js)中数组方法的处理
+
+## 构建配置
+
+构建配置使用Rollup，详见[rollup.config.js](mdc:rollup.config.js)：
+- 入口：src/index.js
+- 输出：dist/vue.js (UMD格式)
+- 使用Babel转译ES6+代码

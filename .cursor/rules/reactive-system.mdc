@@ -1,0 +1,36 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Vue2响应式系统实现
+
+本规则描述了Vue2响应式系统的实现原理和关键文件。
+
+## 核心概念
+
+Vue2的响应式系统基于以下几个核心概念：
+
+1. **数据劫持** - 使用`Object.defineProperty`对数据进行劫持，在getter中收集依赖，在setter中触发更新
+2. **Observer** - 负责将数据对象的所有属性转换为getter/setter形式
+3. **数组方法重写** - 通过原型链技术重写数组方法，使数组操作也能触发更新
+
+## 关键文件
+
+- [src/observe/index.js](mdc:src/observe/index.js) - 实现了`Observer`类和`observe`函数，负责数据劫持
+  - `Observer`类 - 将对象转换为响应式对象
+  - `defineReactive`函数 - 使用`Object.defineProperty`定义响应式属性
+  - `observe`函数 - 入口函数，处理不同类型的值
+
+- [src/observe/array.js](mdc:src/observe/array.js) - 通过原型链技术重写数组方法
+  - 重写了7个可能改变数组自身的方法：push、pop、shift、unshift、sort、splice、reverse
+  - 保证了数组变异方法也能触发更新
+
+## 初始化流程
+
+数据响应式处理的流程：
+1. Vue实例化时调用`_init`方法 ([src/init.js](mdc:src/init.js))
+2. `_init`调用`initState`处理各种选项 ([src/state.js](mdc:src/state.js))
+3. `initState`根据选项类型调用相应的初始化函数，如`initData`
+4. `initData`将数据对象变为响应式并进行代理
+5. 调用`observe`函数开始数据劫持 ([src/observe/index.js](mdc:src/observe/index.js))

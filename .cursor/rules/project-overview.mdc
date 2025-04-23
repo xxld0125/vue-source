@@ -1,0 +1,27 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Vue2源码学习项目概述
+
+本项目是一个Vue2源码的学习实现，旨在理解Vue2的响应式系统和核心功能。
+
+## 项目结构
+
+- [src/index.js](mdc:src/index.js) - 项目入口文件，定义了Vue构造函数
+- [src/init.js](mdc:src/init.js) - 初始化相关功能，包含Vue实例初始化逻辑
+- [src/state.js](mdc:src/state.js) - 状态初始化，处理props和data等选项
+- [src/observe](mdc:src/observe) - 响应式系统实现目录
+  - [src/observe/index.js](mdc:src/observe/index.js) - 响应式系统核心，包含Observer类
+  - [src/observe/array.js](mdc:src/observe/array.js) - 数组方法重写，实现数组响应式
+
+## 构建配置
+
+项目使用Rollup进行打包构建：
+- [rollup.config.js](mdc:rollup.config.js) - 构建配置
+- [.babelrc](mdc:.babelrc) - Babel配置
+
+## 开发命令
+
+- `pnpm dev` - 启动开发环境（带热重载）
