@@ -1,0 +1,9 @@
+#!/bin/sh
+
+echo "运行测试以确保代码质量..."
+npm test
+if [ $? -ne 0 ]; then
+  echo "测试失败！请先修复测试问题，然后再提交代码。"
+  exit 1
+fi
+echo "测试通过，继续提交..."
