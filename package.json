@@ -11,7 +11,8 @@
     "dev": "rollup -c -w",
     "test": "vitest run",
     "test:watch": "vitest",
-    "prepare": "husky"
+    "prepare": "husky",
+    "coverage": "vitest run --coverage"
   },
   "repository": {
     "type": "git",
