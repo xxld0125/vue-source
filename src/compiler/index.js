@@ -1,136 +1,83 @@
-const ncname = `[a-zA-Z_][\\-\\.0-9_a-zA-Z]*`; // 匹配标签名, 比如 div, div:id
-const qnameCapture = `((?:${ncname}\\:)?${ncname})`; // 匹配标签名, 比如 div, div:id
-const startTagOpen = new RegExp(`^<${qnameCapture}`); // 匹配开始标签, 比如 <div
-
-const endTag = new RegExp(`^<\\/${qnameCapture}[^>]*>`); // 匹配结束标签, 比如 </div>
-const attribute =
-  /^\s*([^\s"'<>\/=]+)(?:\s*(=)\s*(?:"([^"]*)"+|'([^']*)'+|([^\s"'=<>`]+)))?/; // 匹配属性, 比如 id="app"
-const startTagClose = /^\s*(\/?)>/; // 匹配开始标签的闭合, 比如 />
+import { parseHTML } from "./parse";
 
 const defaultTagRE = /\{\{((?:.|\r?\n)+?)\}\}/g; // 匹配插值, 比如 {{ message }}
 
-function parseHTML(html) {
-  const ELEMENT_TYPE = 1; // 元素类型
-  const TEXT_TYPE = 3; // 文本类型
-  const stack = []; // 栈, 用于存储元素
-  let currentParent; // 当前父元素
-  let root; // 根元素
-
-  // 创建ast元素
-  const createASTElement = (tagName, attrs) => {
-    return {
-      type: ELEMENT_TYPE,
-      tag: tagName,
-      attrs,
-      children: [],
-      parent: null,
-    };
-  };
-
-  function start(tagName, attrs) {
-    let node = createASTElement(tagName, attrs);
-    if (!root) {
-      root = node; // 如果根元素不存在, 则将当前元素设置为根元素
-    }
-    if (currentParent) {
-      node.parent = currentParent; // 设置当前元素的父元素
-      currentParent.children.push(node); // 将当前元素添加到父元素的children中
-    }
-    stack.push(node); // 将当前元素压入栈
-    currentParent = node; // 将当前元素设置为当前父元素
-  }
-
-  function chars(text) {
-    text = text.replace(/\s/g, "");
-    if (text) {
-      currentParent.children.push({
-        type: TEXT_TYPE,
-        text,
-        parent: currentParent,
+// 将attrs转换成字符串
+function genProps(attrs) {
+  let str = "";
+  for (let i = 0; i < attrs.length; i++) {
+    let attr = attrs[i];
+    if (attr.name === "style") {
+      // 将style转换成对象
+      let obj = {};
+      attr.value.split(";").forEach((item) => {
+        if (item) {
+          const [key, value] = item.split(":");
+          obj[key] = value.trim();
+        }
       });
+      attr.value = obj;
     }
+    str += `${attr.name}:${JSON.stringify(attr.value)},`;
   }
+  return `{${str.slice(0, -1)}}`;
+}
 
-  function end() {
-    stack.pop();
-    currentParent = stack[stack.length - 1];
-  }
-
-  function advance(n) {
-    html = html.substring(n);
-  }
-
-  function parseStartTag() {
-    const start = html.match(startTagOpen);
-
-    // 如果匹配到开始标签
-    if (start) {
-      const match = {
-        tagName: start[1], // 标签名
-        attrs: [], // 属性
-      };
-
-      advance(start[0].length);
-
-      // 如果不是开始标签的结束, 则继续匹配属性
-      let attr, end;
-      while (
-        !(end = html.match(startTagClose)) &&
-        (attr = html.match(attribute))
-      ) {
-        advance(attr[0].length);
-        match.attrs.push({
-          name: attr[1],
-          value: attr[3] || attr[4] || attr[5],
-        });
-      }
-
-      // 如果匹配到开始标签的结束, 则返回匹配到的标签
-      if (end) {
-        advance(end[0].length);
-        return match;
-      }
-    }
-
-    return false; // 没有匹配到开始标签
-  }
-
-  // 解析html
-  while (html) {
-    let textEnd = html.indexOf("<");
-    // 如果模板字符串以<开头, 则认为是开始标签
-    if (textEnd === 0) {
-      let startTagMatch = parseStartTag();
-      if (startTagMatch) {
-        // 如果匹配到开始标签, 则继续匹配
-        start(startTagMatch.tagName, startTagMatch.attrs);
-        continue;
-      }
-
-      let endTagMatch = html.match(endTag);
-      // 如果匹配到结束标签, 则继续匹配
-      if (endTagMatch) {
-        advance(endTagMatch[0].length);
-        end(endTagMatch[1]);
-        continue;
-      }
-      break;
+function gen(node) {
+  // 1. 如果是元素节点
+  if (node.type === 1) {
+    return codegen(node);
+  } else {
+    let text = node.text;
+    if (!defaultTagRE.test(text)) {
+      // 2. 如果是纯文本节点
+      return `_v(${JSON.stringify(text)})`;
     } else {
-      let text = html.substring(0, textEnd);
-      if (text) {
-        chars(text);
-        advance(text.length);
+      // 3. 如果是插值节点
+      let tokens = [];
+      let match;
+      defaultTagRE.lastIndex = 0; // 重置lastIndex, 避免全局匹配
+      let lastIndex = 0;
+      while ((match = defaultTagRE.exec(text))) {
+        let index = match.index;
+        if (index > lastIndex) {
+          tokens.push(JSON.stringify(text.slice(lastIndex, index)));
+        }
+        tokens.push(`_s(${match[1].trim()})`);
+        lastIndex = index + match[0].length;
       }
+      if (lastIndex < text.length) {
+        tokens.push(JSON.stringify(text.slice(lastIndex)));
+      }
+      return `_v(${tokens.join("+")})`;
     }
   }
+}
 
-  console.log(root);
+// 将children转换成字符串
+function genChildren(children) {
+  return children.map((child) => gen(child)).join(",");
+}
+
+// 将ast转换成render函数
+function codegen(ast) {
+  let code = `_c('${ast.tag}', ${
+    ast.attrs?.length > 0 ? genProps(ast.attrs) : "null"
+  }
+  ${ast.children?.length > 0 ? `,${genChildren(ast.children)}` : ""}
+  )`;
+
+  return code;
 }
 
 export function compileToFunction(template) {
   // 1.将模版编译成ast语法树
   let ast = parseHTML(template);
+
   // 2.将ast语法树编译成render函数
+  let code = codegen(ast);
+  console.log("===code", code);
+
   // 3.将render函数转换成虚拟dom
   // 4.将虚拟dom转换成真实dom
 }

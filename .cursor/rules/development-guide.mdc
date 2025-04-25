@@ -24,14 +24,22 @@ alwaysApply: true
    pnpm dev
    ```
 
-3. 构建输出在[dist](mdc:dist)目录中
+3. 运行测试
+   ```bash
+   pnpm test        # 运行所有测试
+   pnpm test:watch  # 监视模式运行测试
+   pnpm coverage    # 生成测试覆盖率报告
+   ```
+
+4. 构建输出在[dist](mdc:dist)目录中
 
 ## 代码规范
 
 项目遵循以下代码规范：
-- 使用ES模块规范
+- 使用ES模块规范（package.json中设置了`"type": "module"`）
 - 函数和类使用单一职责原则
 - 代码风格遵循[.editorconfig](mdc:.editorconfig)配置
+- 使用Husky进行Git钩子管理
 
 ## 学习路径
 
@@ -42,6 +50,7 @@ alwaysApply: true
 3. 理解[src/state.js](mdc:src/state.js)中的状态初始化
 4. 深入[src/observe/index.js](mdc:src/observe/index.js)学习响应式原理
 5. 学习[src/observe/array.js](mdc:src/observe/array.js)中数组方法的处理
+6. 探索[src/compiler/index.js](mdc:src/compiler/index.js)中的模板编译逻辑
 
 ## 构建配置
 
@@ -49,3 +58,15 @@ alwaysApply: true
 - 入口：src/index.js
 - 输出：dist/vue.js (UMD格式)
 - 使用Babel转译ES6+代码
+- 支持sourcemap便于调试
+
+## 测试框架
+
+测试使用Vitest，配置详见[vitest.config.js](mdc:vitest.config.js)：
+- 测试环境：jsdom
+- 测试文件位置：__tests__/**/*.spec.js
+- 覆盖率要求：
+  - 语句覆盖率：90%
+  - 分支覆盖率：85%
+  - 函数覆盖率：90%
+  - 行覆盖率：90%
