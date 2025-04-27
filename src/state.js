@@ -29,8 +29,6 @@ function initData(vm) {
 
   data = vm._data = typeof data === "function" ? data.call(vm) : data; // 如果data是函数，则执行函数，否则直接赋值
 
-  vm._data = data;
-
   // 对数据进行劫持
   observe(data);
 
