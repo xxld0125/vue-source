@@ -1,5 +1,6 @@
 import { initState } from "./state";
 import { compileToFunction } from "./compiler";
+import { mountComponent } from "./lifecycle";
 
 // 给Vue添加_init方法
 export function initMixin(Vue) {
@@ -29,5 +30,18 @@ export function initMixin(Vue) {
       const render = compileToFunction(template);
       options.render = render;
     }
+
+    console.log("===render", options.render);
+
+    mountComponent(vm, el); // 挂载组件
   };
 }
+
+/*
+  Vue核心流程
+  1.创造响应式数据
+  2.模版转换成ast语法树
+  3.将ast语法树转换成render函数
+  4.执行render函数, 生成虚拟dom
+  5.将虚拟dom转换成真实dom
+*/

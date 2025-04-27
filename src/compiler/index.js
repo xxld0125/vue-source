@@ -76,8 +76,11 @@ export function compileToFunction(template) {
 
   // 2.将ast语法树编译成render函数
   let code = codegen(ast);
-  console.log("===code", code);
 
-  // 3.将render函数转换成虚拟dom
-  // 4.将虚拟dom转换成真实dom
+  // 模版引擎的实现原理就是 with + new Function
+
+  // 创建render函数
+  const render = new Function(`with(this){return ${code}}`);
+
+  return render;
 }
