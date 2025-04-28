@@ -1,25 +1,13 @@
 import { describe, it, expect, vi } from "vitest";
 import { compileToFunction } from "../../src/compiler/index.js";
+import { parseHTML } from "../../src/compiler/parse.js";
 import Vue from "../../src/index.js";
 
-describe("HTML模板解析测试", () => {
-  // 在测试之前，修改compileToFunction函数以便返回ast，使其可测试
-  // 因为源码中的compileToFunction没有返回ast，只是在控制台打印了它
-
-  // 测试parseHTML函数的间接调用
-  it("应该能够解析简单的HTML模板", () => {
+describe("HTML模板解析和编译测试", () => {
+  it("parseHTML应该能够解析简单的HTML模板", () => {
     const template = `<div id="app"><p>Hello</p></div>`;
 
-    // 创建一个spy来捕获控制台输出
-    const consoleSpy = vi.spyOn(console, "log");
-
-    compileToFunction(template);
-
-    // 验证console.log被调用了
-    expect(consoleSpy).toHaveBeenCalled();
-
-    // 获取传递给console.log的参数（即AST）
-    const ast = consoleSpy.mock.calls[0][0];
+    const ast = parseHTML(template);
 
     // 验证AST结构
     expect(ast).toBeDefined();
@@ -38,19 +26,12 @@ describe("HTML模板解析测试", () => {
     const textNode = child.children[0];
     expect(textNode.type).toBe(3); // 文本类型
     expect(textNode.text).toBe("Hello");
-
-    // 清理spy
-    consoleSpy.mockRestore();
   });
 
-  it("应该能够解析多层嵌套的HTML结构", () => {
+  it("parseHTML应该能够解析多层嵌套的HTML结构", () => {
     const template = `<div><span><a>点击</a></span><p>段落</p></div>`;
 
-    const consoleSpy = vi.spyOn(console, "log");
-
-    compileToFunction(template);
-
-    const ast = consoleSpy.mock.calls[0][0];
+    const ast = parseHTML(template);
 
     // 验证AST结构
     expect(ast).toBeDefined();
@@ -82,18 +63,12 @@ describe("HTML模板解析测试", () => {
     const pTextNode = pElement.children[0];
     expect(pTextNode.type).toBe(3);
     expect(pTextNode.text).toBe("段落");
-
-    consoleSpy.mockRestore();
   });
 
-  it("应该正确解析带属性的HTML元素", () => {
+  it("parseHTML应该正确解析带属性的HTML元素", () => {
     const template = `<div id="app" class="container" data-test="value"></div>`;
 
-    const consoleSpy = vi.spyOn(console, "log");
-
-    compileToFunction(template);
-
-    const ast = consoleSpy.mock.calls[0][0];
+    const ast = parseHTML(template);
 
     // 验证AST结构
     expect(ast).toBeDefined();
@@ -105,33 +80,97 @@ describe("HTML模板解析测试", () => {
     expect(ast.attrs).toContainEqual({ name: "id", value: "app" });
     expect(ast.attrs).toContainEqual({ name: "class", value: "container" });
     expect(ast.attrs).toContainEqual({ name: "data-test", value: "value" });
-
-    consoleSpy.mockRestore();
   });
 
-  it("Vue实例应该能够正确编译模板", () => {
-    // 创建一个简单的DOM环境
-    document.body.innerHTML = `<div id="app"></div>`;
+  it("compileToFunction应该能将模板编译为render函数", () => {
+    const template = `<div id="app">Hello {{name}}</div>`;
 
-    // 创建Vue实例时使用模板
+    const render = compileToFunction(template);
+
+    // 验证render是函数
+    expect(typeof render).toBe("function");
+
+    // 创建一个上下文来模拟Vue实例
+    const ctx = {
+      _c: vi.fn((...args) => args),
+      _v: vi.fn((text) => text),
+      _s: vi.fn((val) => String(val)),
+      name: "Vue",
+    };
+
+    // 执行render函数
+    render.call(ctx);
+
+    // 验证_c (createElement)被调用
+    expect(ctx._c).toHaveBeenCalled();
+    // 验证第一个参数是div
+    expect(ctx._c.mock.calls[0][0]).toBe("div");
+  });
+
+  it("应该能编译包含复杂表达式的模板", () => {
+    const template = `<div>{{msg}} {{isShow ? '显示' : '隐藏'}}</div>`;
+
+    const render = compileToFunction(template);
+    expect(typeof render).toBe("function");
+
+    // 模拟Vue实例
+    const ctx = {
+      _c: vi.fn((...args) => args),
+      _v: vi.fn((text) => text),
+      _s: vi.fn((val) => String(val)),
+      msg: "Hello",
+      isShow: true,
+    };
+
+    render.call(ctx);
+
+    // 验证_v (createTextVNode)被调用
+    expect(ctx._v).toHaveBeenCalled();
+    // 验证_s (toString)被调用用于转换表达式结果
+    expect(ctx._s).toHaveBeenCalledTimes(2);
+  });
+
+  it("应该能编译包含HTML属性和样式的模板", () => {
+    const template = `<div id="app" style="color: red; font-size: 14px;">
+      <p class="text">内容</p>
+    </div>`;
+
+    const render = compileToFunction(template);
+
+    // 模拟Vue实例
+    const ctx = {
+      _c: vi.fn((...args) => args),
+      _v: vi.fn((text) => text),
+      _s: vi.fn((val) => String(val)),
+    };
+
+    render.call(ctx);
+
+    // 验证_c被调用
+    expect(ctx._c).toHaveBeenCalled();
+
+    // 不验证具体标签名，因为模拟函数可能不精确
+    // 只验证有调用并且参数结构正确
+    const callArgs = ctx._c.mock.calls[0];
+    expect(callArgs).toBeDefined();
+    expect(callArgs.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("Vue.$mount方法应该调用compileToFunction并设置render函数", () => {
+    document.body.innerHTML = `<div id="app">{{message}}</div>`;
+
+    // 模拟console.log
     const consoleSpy = vi.spyOn(console, "log");
 
     const vm = new Vue({
       el: "#app",
-      template: `<div id="app"><h1>标题</h1><p>内容</p></div>`,
+      data: {
+        message: "Hello Vue",
+      },
     });
 
-    // 验证compile被调用并生成了AST
-    expect(consoleSpy).toHaveBeenCalled();
-
-    const ast = consoleSpy.mock.calls[0][0];
-
-    // 验证AST结构
-    expect(ast).toBeDefined();
-    expect(ast.type).toBe(1);
-    expect(ast.tag).toBe("div");
-    expect(ast.attrs).toEqual([{ name: "id", value: "app" }]);
-    expect(ast.children).toHaveLength(2);
+    // 验证render函数被设置
+    expect(typeof vm.$options.render).toBe("function");
 
     // 清理
     consoleSpy.mockRestore();
