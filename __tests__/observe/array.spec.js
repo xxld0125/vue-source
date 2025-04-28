@@ -20,6 +20,23 @@ describe("数组响应式测试", () => {
     const spliced = arr.splice(1, 1, "a");
     expect(spliced).toEqual([2]);
     expect(arr).toEqual([1, "a", 3]);
+
+    // 测试shift方法
+    const shifted = arr.shift();
+    expect(shifted).toBe(1);
+    expect(arr).toEqual(["a", 3]);
+
+    // 测试unshift方法
+    arr.unshift("b");
+    expect(arr).toEqual(["b", "a", 3]);
+
+    // 测试sort方法
+    arr.sort();
+    expect(arr).toEqual([3, "a", "b"]);
+
+    // 测试reverse方法
+    arr.reverse();
+    expect(arr).toEqual(["b", "a", 3]);
   });
 
   it("应该使数组中新增的对象元素也是响应式的", () => {
@@ -31,8 +48,13 @@ describe("数组响应式测试", () => {
     expect(arr[0].__ob__).toBeDefined();
 
     // 通过splice添加对象
-    arr.splice(1, 0, { name: "obj3" });
+    arr.splice(1, 0, { name: "obj2" });
     expect(arr[1].__ob__).toBeDefined();
+
+    // 通过unshift添加对象
+    arr.unshift({ name: "obj3" });
+    expect(arr[0].__ob__).toBeDefined();
+    expect(arr[0].name).toBe("obj3");
   });
 
   it("数组响应式系统应该在Vue实例中正常工作", () => {
@@ -56,5 +78,23 @@ describe("数组响应式测试", () => {
     expect(vm.nestedArray.__ob__).toBeDefined();
     expect(vm.nestedArray[0].__ob__).toBeDefined();
     expect(vm.nestedArray[0][0].__ob__).toBeDefined();
+  });
+
+  it("数组原始方法不应该被影响", () => {
+    // 保存原始数组方法
+    const originalPush = Array.prototype.push;
+
+    const arr = [1, 2];
+    observe(arr);
+
+    // 创建新数组，不应该被观察者修改
+    const normalArr = [3, 4];
+
+    // 调用push方法
+    normalArr.push(5);
+
+    // 验证原始方法未被修改
+    expect(Array.prototype.push).toBe(originalPush);
+    expect(normalArr).toEqual([3, 4, 5]);
   });
 });

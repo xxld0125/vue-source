@@ -1,6 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { observe } from "../../src/observe/index.js";
 import Vue from "../../src/index.js";
+import Dep from "../../src/observe/dep.js";
+import Watcher from "../../src/observe/watcher.js";
 
 describe("响应式系统测试", () => {
   it("应该将一个普通对象转换为响应式对象", () => {
@@ -86,5 +88,60 @@ describe("响应式系统测试", () => {
     vm.user = { name: "lisi" };
     expect(vm._data.user.name).toBe("lisi");
     expect(vm.user.__ob__).toBeDefined();
+  });
+
+  it("Dep应该能够收集和通知观察者", () => {
+    // 创建一个响应式对象
+    const data = { message: "Hello" };
+    observe(data);
+
+    // 创建一个模拟的watcher对象
+    const watcher = {
+      update: vi.fn(),
+      addDep: function (dep) {
+        dep.addSub(this);
+      },
+    };
+
+    // 模拟Dep.target
+    Dep.target = watcher;
+
+    // 触发getter以收集依赖
+    data.message;
+
+    // 恢复Dep.target
+    Dep.target = null;
+
+    // 触发setter以通知依赖
+    data.message = "Updated";
+
+    // 验证watcher的update方法被调用
+    expect(watcher.update).toHaveBeenCalled();
+  });
+
+  it("Watcher应该在依赖数据变化时触发更新", () => {
+    // 创建一个简单的Vue实例
+    const vm = new Vue({
+      data: {
+        message: "Hello",
+      },
+    });
+
+    // 创建一个mock函数监控数据变化
+    const fn = vi.fn(() => {
+      return vm.message;
+    });
+
+    // 创建一个watcher
+    const watcher = new Watcher(vm, fn, true);
+
+    // 修改数据
+    vm.message = "Updated";
+
+    // 手动执行更新队列
+    watcher.run();
+
+    // 验证fn被再次调用
+    expect(fn).toHaveBeenCalledTimes(2);
   });
 });

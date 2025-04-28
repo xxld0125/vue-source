@@ -35,7 +35,78 @@ class Watcher {
   }
 
   update() {
-    this.get(); // 重新渲染
+    queueWatcher(this); // 将watcher放入队列中
+  }
+
+  run() {
+    this.get();
+  }
+}
+
+let queue = []; // 队列
+let has = {}; // 去重
+let pending = false; // 是否正在刷新队列
+
+function flushSchedulerQueue() {
+  let flushQueue = queue.slice(0);
+  queue = [];
+  has = {};
+  pending = false;
+  flushQueue.forEach((q) => q.run());
+}
+
+function queueWatcher(watcher) {
+  const id = watcher.id;
+  if (!has[id]) {
+    queue.push(watcher);
+    has[id] = true;
+
+    if (!pending) {
+      nextTick(flushSchedulerQueue, 0);
+      pending = true;
+    }
+  }
+}
+
+let callbacks = [];
+let waiting = false;
+
+function flushCallbacks() {
+  let cbs = callbacks.slice(0);
+  waiting = false;
+  callbacks = [];
+  cbs.forEach((cb) => cb());
+}
+
+let timerFunc;
+if (Promise) {
+  timerFunc = () => {
+    Promise.resolve().then(flushCallbacks);
+  };
+} else if (MutationObserver) {
+  let observer = new MutationObserver(flushCallbacks);
+  let textNode = document.createTextNode(1);
+  observer.observe(textNode, {
+    characterData: true,
+  });
+  timerFunc = () => {
+    textNode.textContent = 2;
+  };
+} else if (setImmediate) {
+  timerFunc = () => {
+    setImmediate(flushCallbacks);
+  };
+} else {
+  timerFunc = () => {
+    setTimeout(flushCallbacks);
+  };
+}
+
+export function nextTick(cb) {
+  callbacks.push(cb);
+  if (!waiting) {
+    timerFunc();
+    waiting = true;
   }
 }
 

@@ -82,4 +82,57 @@ describe("虚拟节点系统测试", () => {
     expect(parent.children[1].children).toHaveLength(1);
     expect(parent.children[1].children[0].text).toBe("嵌套文本");
   });
+
+  it("创建没有子节点的元素节点", () => {
+    const vm = {};
+    const tag = "div";
+    const data = { id: "empty" };
+
+    const vnode = createElementVNode(vm, tag, data);
+
+    expect(vnode).toEqual({
+      vm,
+      tag,
+      key: undefined,
+      data,
+      children: [],
+      text: undefined,
+    });
+  });
+
+  it("创建没有data属性的元素节点", () => {
+    const vm = {};
+    const tag = "p";
+    const child = "文本内容";
+
+    const vnode = createElementVNode(vm, tag, null, child);
+
+    expect(vnode).toEqual({
+      vm,
+      tag,
+      key: undefined,
+      data: null,
+      children: [child],
+      text: undefined,
+    });
+  });
+
+  it("key为null或undefined时不应影响结果", () => {
+    const vm = {};
+    const tag = "div";
+
+    // key为null的情况
+    const data1 = { key: null, id: "test1" };
+    const vnode1 = createElementVNode(vm, tag, data1);
+
+    expect(vnode1.key).toBe(null);
+    expect(vnode1.data.key).toBe(null);
+
+    // key为undefined的情况
+    const data2 = { key: undefined, id: "test2" };
+    const vnode2 = createElementVNode(vm, tag, data2);
+
+    expect(vnode2.key).toBe(undefined);
+    expect(vnode2.data.key).toBe(undefined);
+  });
 });

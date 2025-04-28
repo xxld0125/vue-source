@@ -89,4 +89,23 @@ describe("Vue构造函数测试", () => {
     Vue.prototype.$mount = originalMount;
     document.body.innerHTML = "";
   });
+
+  it("应该提供$nextTick方法用于异步DOM更新", async () => {
+    const vm = new Vue({});
+
+    // 检查$nextTick方法是否存在
+    expect(typeof vm.$nextTick).toBe("function");
+
+    // 模拟异步操作
+    let flag = false;
+    vm.$nextTick(() => {
+      flag = true;
+    });
+
+    // 等待nextTick回调执行
+    await Promise.resolve();
+
+    // 验证回调已执行
+    expect(flag).toBe(true);
+  });
 });
