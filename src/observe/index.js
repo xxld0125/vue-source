@@ -1,4 +1,5 @@
 import arrayMethods from "./array";
+import Dep from "./dep";
 
 class Observer {
   constructor(data) {
@@ -38,14 +39,19 @@ class Observer {
 function defineReactive(target, key, value) {
   // 如果value是对象, 则递归劫持
   observe(value);
+
+  let dep = new Dep(); // 每个属性都有一个dep
+
   Object.defineProperty(target, key, {
     get() {
+      Dep.target && dep.depend(); // 将当前的watcher添加到dep中
       return value;
     },
     set(newValue) {
       if (newValue === value) return;
       observe(newValue); // 如果newValue是对象, 则递归劫持
       value = newValue;
+      dep.notify(); // 通知视图更新
     },
   });
 }
