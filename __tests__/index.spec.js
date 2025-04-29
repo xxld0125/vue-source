@@ -108,4 +108,74 @@ describe("Vue构造函数测试", () => {
     // 验证回调已执行
     expect(flag).toBe(true);
   });
+
+  it("全局API - Vue.mixin应该正确合并选项", () => {
+    // 保存当前options，以便测试后恢复
+    const originalOptions = { ...Vue.options };
+
+    // 使用mixin添加全局方法
+    Vue.mixin({
+      methods: {
+        globalMethod() {
+          return "global method called";
+        },
+      },
+    });
+
+    // 创建Vue实例
+    const vm = new Vue({});
+
+    // 验证方法已合并到实例选项中
+    expect(vm.$options.methods).toBeDefined();
+
+    // 恢复原始选项，避免影响其他测试
+    Vue.options = originalOptions;
+  });
+
+  it("全局API - Vue.mixin应该支持多次调用", () => {
+    // 保存当前options，以便测试后恢复
+    const originalOptions = { ...Vue.options };
+
+    // 使用简单的对象而非生命周期钩子进行测试
+    Vue.mixin({
+      a: 1,
+    });
+
+    Vue.mixin({
+      b: 2,
+    });
+
+    // 创建Vue实例
+    const vm = new Vue({
+      c: 3,
+    });
+
+    // 验证选项已合并
+    expect(vm.$options.a).toBe(1);
+    expect(vm.$options.b).toBe(2);
+    expect(vm.$options.c).toBe(3);
+
+    // 恢复原始选项
+    Vue.options = originalOptions;
+  });
+
+  it("应该正确使用Vue.options存储全局配置", () => {
+    // 验证Vue.options存在
+    expect(Vue.options).toBeDefined();
+
+    // 保存当前options，以便测试后恢复
+    const originalOptions = { ...Vue.options };
+
+    // 设置一个简单的测试选项
+    Vue.options.globalTest = "global value";
+
+    // 创建Vue实例
+    const vm = new Vue({});
+
+    // 验证全局选项已应用到实例
+    expect(vm.$options.globalTest).toBe("global value");
+
+    // 恢复原始选项
+    Vue.options = originalOptions;
+  });
 });

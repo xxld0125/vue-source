@@ -90,3 +90,11 @@ export function mountComponent(vm, el) {
   };
   new Watcher(vm, updateComponent, true);
 }
+
+// 调用钩子
+export function callHook(vm, hook) {
+  const handlers = vm.$options[hook];
+  if (handlers) {
+    handlers.forEach((handler) => handler.call(vm));
+  }
+}
