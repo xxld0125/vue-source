@@ -1,5 +1,5 @@
 let id = 0; // 不同组件有不同的watcher
-import Dep from "./dep";
+import Dep, { pushTarget, popTarget } from "./dep";
 
 // 观察者模式
 // 每个属性有一个dep(属性就是被观察者), watcher就是观察者(属性变化了会通知观察者来更新)
@@ -15,7 +15,16 @@ class Watcher {
 
     this.depsId = new Set();
 
-    this.get(); // 执行渲染watcher的回调
+    this.lazy = options.lazy; // 是否是计算属性
+
+    this.dirty = this.lazy; // 计算属性是否需要重新计算
+
+    this.vm = vm;
+
+    if (this.lazy) {
+    } else {
+      this.get(); // 执行渲染watcher的回调
+    }
   }
 
   addDep(dep) {
@@ -28,14 +37,31 @@ class Watcher {
     }
   }
 
+  evaluate() {
+    this.value = this.get();
+    this.dirty = false;
+  }
+
   get() {
-    Dep.target = this; // 将当前的watcher设置为Dep的target
-    this.getter();
-    Dep.target = null; // 清空Dep的target
+    pushTarget(this);
+    const value = this.getter.call(this.vm);
+    popTarget();
+    return value;
+  }
+
+  depend() {
+    let i = this.deps.length;
+    while (i--) {
+      this.deps[i].depend(); // 让计算属性watcher也收集渲染watcher
+    }
   }
 
   update() {
-    queueWatcher(this); // 将watcher放入队列中
+    if (this.lazy) {
+      this.dirty = true;
+    } else {
+      queueWatcher(this); // 将watcher放入队列中
+    }
   }
 
   run() {

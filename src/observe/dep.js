@@ -27,4 +27,16 @@ class Dep {
 
 Dep.target = null; // 当前的watcher
 
+let stack = []; // 存储watcher
+
+export function pushTarget(watcher) {
+  stack.push(watcher);
+  Dep.target = watcher;
+}
+
+export function popTarget() {
+  stack.pop();
+  Dep.target = stack[stack.length - 1];
+}
+
 export default Dep;
