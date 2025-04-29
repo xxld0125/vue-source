@@ -26,6 +26,9 @@ methods.forEach((method) => {
       this.__ob__.observeArray(inserted);
     }
 
+    // 数组变化了, 通知视图更新
+    this.__ob__.dep.notify();
+
     return result;
   };
 });

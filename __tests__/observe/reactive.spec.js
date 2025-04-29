@@ -144,4 +144,78 @@ describe("响应式系统测试", () => {
     // 验证fn被再次调用
     expect(fn).toHaveBeenCalledTimes(2);
   });
+
+  it("对象的依赖应该被收集到__ob__.dep中", () => {
+    // 创建响应式对象
+    const data = {
+      items: [1, 2, 3],
+      obj: { a: 1 },
+    };
+    observe(data);
+
+    // 模拟watcher
+    const watcher = {
+      update: vi.fn(),
+      addDep: function (dep) {
+        dep.addSub(this);
+      },
+    };
+
+    // 设置Dep.target并访问属性
+    Dep.target = watcher;
+
+    // 访问数组，触发依赖收集
+    data.items[0];
+
+    // 重置Dep.target
+    Dep.target = null;
+
+    // 获取数组的Observer实例
+    const ob = data.items.__ob__;
+
+    // 直接调用对象的dep通知方法
+    ob.dep.notify();
+
+    // 验证watcher的update被调用
+    expect(watcher.update).toHaveBeenCalled();
+  });
+
+  it("对象和数组的依赖收集系统应该同时工作", () => {
+    // 创建一个带有嵌套数组和对象的响应式对象
+    const data = {
+      list: [{ name: "item1" }, { name: "item2" }],
+      info: {
+        title: "test",
+        meta: [1, 2, 3],
+      },
+    };
+    observe(data);
+
+    // 模拟watcher
+    const watcher = {
+      update: vi.fn(),
+      addDep: function (dep) {
+        dep.addSub(this);
+      },
+    };
+
+    // 设置Dep.target并访问嵌套属性
+    Dep.target = watcher;
+
+    // 访问嵌套对象和数组
+    data.list[0].name;
+    data.info.meta[1];
+
+    // 重置Dep.target
+    Dep.target = null;
+
+    // 1. 测试数组方法变更通知
+    data.list.push({ name: "item3" });
+    expect(watcher.update).toHaveBeenCalled();
+    watcher.update.mockClear();
+
+    // 2. 测试嵌套数组方法变更通知
+    data.info.meta.push(4);
+    expect(watcher.update).toHaveBeenCalled();
+  });
 });

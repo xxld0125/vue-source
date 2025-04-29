@@ -1,6 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { observe } from "../../src/observe/index.js";
 import Vue from "../../src/index.js";
+import Dep from "../../src/observe/dep.js";
+import Watcher from "../../src/observe/watcher.js";
 
 describe("数组响应式测试", () => {
   it("应该重写数组方法并保持原有功能", () => {
@@ -96,5 +98,55 @@ describe("数组响应式测试", () => {
     // 验证原始方法未被修改
     expect(Array.prototype.push).toBe(originalPush);
     expect(normalArr).toEqual([3, 4, 5]);
+  });
+
+  it("数组方法调用时应触发依赖更新", () => {
+    // 创建一个响应式数组
+    const arr = [1, 2, 3];
+    const observed = observe(arr);
+
+    // 创建mock更新函数
+    const mockNotify = vi.fn();
+    observed.dep.notify = mockNotify;
+
+    // 调用数组变异方法
+    arr.push(4);
+    expect(mockNotify).toHaveBeenCalledTimes(1);
+
+    arr.pop();
+    expect(mockNotify).toHaveBeenCalledTimes(2);
+
+    arr.splice(0, 1, 5);
+    expect(mockNotify).toHaveBeenCalledTimes(3);
+  });
+
+  it("嵌套数组的依赖应该被正确收集", () => {
+    // 创建一个包含嵌套数组的响应式对象
+    const data = {
+      nested: [
+        [1, 2],
+        [3, 4],
+      ],
+    };
+    observe(data);
+
+    // 模拟watcher
+    const watcher = {
+      update: vi.fn(),
+      addDep: function (dep) {
+        dep.addSub(this);
+      },
+    };
+
+    // 设置Dep.target并访问嵌套数组以收集依赖
+    Dep.target = watcher;
+    data.nested[0][1]; // 访问嵌套数组元素
+    Dep.target = null;
+
+    // 修改嵌套数组
+    data.nested[0].push(5);
+
+    // 验证watcher的update被调用
+    expect(watcher.update).toHaveBeenCalled();
   });
 });
