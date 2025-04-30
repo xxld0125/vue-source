@@ -4,12 +4,18 @@ import Dep, { pushTarget, popTarget } from "./dep";
 // 观察者模式
 // 每个属性有一个dep(属性就是被观察者), watcher就是观察者(属性变化了会通知观察者来更新)
 class Watcher {
-  constructor(vm, fn, options) {
+  constructor(vm, exprOrFn, options, cb) {
     this.id = id++; // 每个watcher都有一个唯一的id
 
     this.renderWatcher = options; // 是否是渲染watcher
 
-    this.getter = fn; // 渲染watcher的回调
+    if (typeof exprOrFn === "string") {
+      this.getter = function () {
+        return vm[exprOrFn];
+      };
+    } else {
+      this.getter = exprOrFn; // 渲染watcher的回调
+    }
 
     this.deps = []; // 存储dep, 后续实现计算属性, 和一些清理工作需要
 
@@ -17,14 +23,15 @@ class Watcher {
 
     this.lazy = options.lazy; // 是否是计算属性
 
+    this.cb = cb; // 用户watcher的回调
+
     this.dirty = this.lazy; // 计算属性是否需要重新计算
 
     this.vm = vm;
 
-    if (this.lazy) {
-    } else {
-      this.get(); // 执行渲染watcher的回调
-    }
+    this.user = options.user; // 是否是用户watcher
+
+    this.value = this.lazy ? undefined : this.get();
   }
 
   addDep(dep) {
@@ -65,7 +72,12 @@ class Watcher {
   }
 
   run() {
-    this.get();
+    const oldValue = this.value;
+    const newValue = this.get();
+
+    if (this.user) {
+      this.cb.call(this.vm, newValue, oldValue);
+    }
   }
 }
 

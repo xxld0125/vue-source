@@ -13,6 +13,31 @@ export function initState(vm) {
   if (opts.computed) {
     initComputed(vm);
   }
+  if (opts.watch) {
+    initWatch(vm);
+  }
+}
+
+function initWatch(vm) {
+  let watch = vm.$options.watch;
+  console.error("==initWatch", watch);
+  for (let key in watch) {
+    const handler = watch[key];
+    if (Array.isArray(handler)) {
+      handler.forEach((h) => {
+        createWatcher(vm, key, h);
+      });
+    } else {
+      createWatcher(vm, key, handler);
+    }
+  }
+}
+
+function createWatcher(vm, key, handler) {
+  if (typeof handler === "string") {
+    handler = vm[handler];
+  }
+  return vm.$watch(key, handler);
 }
 
 function initProps(vm) {}
