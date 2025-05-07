@@ -1,23 +1,15 @@
 import { initMixin } from "./init";
 import { initLifecycle } from "./lifecycle";
-import { nextTick } from "./observe/watcher";
 import { initGlobalAPI } from "./globalAPI";
-import Watcher from "./observe/watcher";
+import { initStateMixin } from "./state";
 
 function Vue(options) {
   this._init(options);
 }
 
-Vue.prototype.$nextTick = nextTick;
-
 initMixin(Vue); // 初始化混入
-initLifecycle(Vue); // 初始化生命周期
+initLifecycle(Vue); // 实现了vm._update vm._render
 initGlobalAPI(Vue); // 初始化全局API
-
-Vue.prototype.$watch = function (exprOrFn, cb, options = {}) {
-  const vm = this;
-  options.user = true;
-  new Watcher(vm, exprOrFn, options, cb, options);
-};
+initStateMixin(Vue); // 实现了$watch和$nextTick
 
 export default Vue;
