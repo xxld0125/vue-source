@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { createElementVNode, createTextVNode } from "../src/vnode/index.js";
+import {
+  createElementVNode,
+  createTextVNode,
+  isSameVnode,
+} from "../src/vnode/index.js";
 
 describe("虚拟节点系统测试", () => {
   it("createElementVNode应该创建正确的元素节点", () => {
@@ -138,5 +142,32 @@ describe("虚拟节点系统测试", () => {
     expect(vnode.key).toBe("test-key");
 
     // 不检查data.key是否被删除，因为实现可能有所不同
+  });
+
+  it("isSameVnode应该正确比较两个虚拟节点是否相同", () => {
+    const vm = {};
+
+    // 创建一些测试用的虚拟节点
+    const node1 = createElementVNode(vm, "div", { key: "test" });
+    const node2 = createElementVNode(vm, "div", { key: "test" });
+    const node3 = createElementVNode(vm, "div", { key: "different" });
+    const node4 = createElementVNode(vm, "span", { key: "test" });
+    const node5 = createElementVNode(vm, "div"); // 没有key
+    const node6 = createElementVNode(vm, "div"); // 没有key
+
+    // 相同标签和key的节点应该被认为是相同的
+    expect(isSameVnode(node1, node2)).toBe(true);
+
+    // 相同标签但不同key的节点应该被认为是不同的
+    expect(isSameVnode(node1, node3)).toBe(false);
+
+    // 不同标签但相同key的节点应该被认为是不同的
+    expect(isSameVnode(node1, node4)).toBe(false);
+
+    // 相同标签且都没有key的节点应该被认为是相同的
+    expect(isSameVnode(node5, node6)).toBe(true);
+
+    // 一个有key一个没有key的节点应该被认为是不同的
+    expect(isSameVnode(node1, node5)).toBe(false);
   });
 });

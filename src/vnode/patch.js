@@ -67,7 +67,7 @@ export function patch(oldVNode, vnode) {
 
     return newElm;
   } else {
-    patchVnode(oldVNode, vnode);
+    return patchVnode(oldVNode, vnode);
   }
 }
 
