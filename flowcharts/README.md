@@ -5,6 +5,7 @@
 ## 目录结构
 
 - `computed-implementation.md` - 计算属性(computed)的实现流程
+- `diff-algorithm.md` - 虚拟DOM的diff算法实现流程
 - 更多流程图将陆续添加...
 
 ## 流程图说明
