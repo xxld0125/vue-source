@@ -1,9 +1,9 @@
 name: 部署VitePress文档
 
 on:
-  # 在master分支上的push触发
+  # 在main分支上的push触发
   push:
-    branches: [master]
+    branches: [main]
   # 允许手动触发
   workflow_dispatch:
 
