@@ -31,7 +31,7 @@ jobs:
       - name: 设置Node.js环境
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 20.12.1
           cache: 'npm'
       
       - name: 安装pnpm
