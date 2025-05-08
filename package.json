@@ -12,7 +12,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "prepare": "husky",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "repository": {
     "type": "git",
@@ -32,8 +35,11 @@
     "@vitest/coverage-v8": "^1.0.0",
     "husky": "^9.1.7",
     "jsdom": "^24.0.0",
+    "mermaid": "^11.6.0",
     "rollup": "^4.40.0",
     "rollup-plugin-babel": "^4.4.0",
+    "vitepress": "^1.0.0-rc.44",
+    "vitepress-plugin-mermaid": "^2.0.17",
     "vitest": "^1.0.0"
   }
 }

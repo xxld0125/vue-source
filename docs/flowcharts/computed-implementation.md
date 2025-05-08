@@ -128,15 +128,10 @@ classDiagram
     ComputedProperty --> Watcher : 调用_computedWatchers中的watcher
     Watcher --> ComputedProperty : 提供计算结果
 
-    note "初始化computed选项时创建watcher并定义计算属性" as VueNote
-    note "计算属性watcher设置lazy为true，依赖数据变化时只标记dirty" as WatcherNote
-    note "存储和通知依赖该数据的watcher" as DepNote
-    note "通过createComputedGetter实现懒计算和缓存" as ComputedNote
-
-    Vue .. VueNote
-    Watcher .. WatcherNote
-    Dep .. DepNote
-    ComputedProperty .. ComputedNote
+    note for Vue "初始化computed选项时创建watcher并定义计算属性"
+    note for Watcher "计算属性watcher设置lazy为true，依赖数据变化时只标记dirty"
+    note for Dep "存储和通知依赖该数据的watcher"
+    note for ComputedProperty "通过createComputedGetter实现懒计算和缓存"
 ```
 
 ## 计算属性的特点总结：
