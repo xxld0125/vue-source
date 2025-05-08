@@ -38,9 +38,9 @@ export default withMermaid(
             ],
           },
         ],
-      },
-      outDir: "../dist-docs",
+      }
     },
+    outDir: "../dist-docs",
     // Mermaid配置
     mermaid: {
       // 可选的Mermaid配置
