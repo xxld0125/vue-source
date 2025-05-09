@@ -3,7 +3,7 @@ import { withMermaid } from "vitepress-plugin-mermaid";
 
 export default withMermaid(
   defineConfig({
-    base: "/vue2-source/",  // 设置GitHub Pages的基本路径
+    base: "/vue2-source/", // 设置GitHub Pages的基本路径
     title: "Vue2源码学习",
     description: "Vue2源码实现与学习笔记",
     themeConfig: {
@@ -30,15 +30,17 @@ export default withMermaid(
             text: "流程图",
             items: [
               { text: "概述", link: "/flowcharts/" },
+              { text: "响应式系统", link: "/flowcharts/reactive-system" },
               {
                 text: "计算属性实现",
                 link: "/flowcharts/computed-implementation",
               },
               { text: "Diff算法", link: "/flowcharts/diff-algorithm" },
+              { text: "组件渲染", link: "/flowcharts/component-rendering" },
             ],
           },
         ],
-      }
+      },
     },
     outDir: "../dist-docs",
     // Mermaid配置
