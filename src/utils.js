@@ -25,6 +25,18 @@ LIFECYCLE_HOOKS.forEach((hook) => {
   };
 });
 
+// 组件的合并策略
+strats.components = function (parentVal, childVal) {
+  const res = Object.create(parentVal); // 创建一个新对象, 继承parentVal
+  if (childVal) {
+    // 如果childVal存在, 则将childVal的属性添加到res中
+    for (let key in childVal) {
+      res[key] = childVal[key];
+    }
+  }
+  return res;
+};
+
 export function mergeOptions(parent, child) {
   const options = {};
 
@@ -46,6 +58,5 @@ export function mergeOptions(parent, child) {
     }
   }
 
-  console.error("====", options);
   return options;
 }

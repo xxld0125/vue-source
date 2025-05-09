@@ -16,27 +16,33 @@ export function initMixin(Vue) {
     callHook(vm, "created"); // 调用created钩子
 
     if (options.el) {
-      vm.$mount(options.el); //
+      vm.$mount(options.el); // 挂载组件
     }
   };
 
   Vue.prototype.$mount = function (el) {
     const vm = this;
-    const options = vm.$options;
     el = document.querySelector(el);
+    let ops = vm.$options;
 
-    if (!options.render) {
-      let template = options.template;
-      if (!template && el) {
+    if (!ops.render) {
+      // 先查找有没有render函数
+      let template;
+      if (!ops.template && el) {
+        // 没有render函数, 也没有template, 则将el的outerHTML作为template
         template = el.outerHTML;
+      } else {
+        template = ops.template;
       }
 
-      // 编译模版
-      const render = compileToFunction(template);
-      options.render = render;
+      // 有模版, 则将模版编译成render函数
+      if (template) {
+        const render = compileToFunction(template);
+        ops.render = render;
+      }
     }
 
-    mountComponent(vm, el); // 挂载组件
+    mountComponent(vm, el);
   };
 }
 
