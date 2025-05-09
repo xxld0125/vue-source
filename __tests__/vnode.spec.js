@@ -4,6 +4,7 @@ import {
   createTextVNode,
   isSameVnode,
 } from "../src/vnode/index.js";
+import Vue from "../src/index.js";
 
 describe("虚拟节点系统测试", () => {
   it("createElementVNode应该创建正确的元素节点", () => {
@@ -21,6 +22,7 @@ describe("虚拟节点系统测试", () => {
       data,
       children,
       text: undefined,
+      componentOptions: undefined,
     });
   });
 
@@ -48,6 +50,7 @@ describe("虚拟节点系统测试", () => {
       data: undefined,
       children: undefined,
       text,
+      componentOptions: undefined,
     });
   });
 
@@ -101,6 +104,7 @@ describe("虚拟节点系统测试", () => {
       data,
       children: [],
       text: undefined,
+      componentOptions: undefined,
     });
   });
 
@@ -169,5 +173,62 @@ describe("虚拟节点系统测试", () => {
 
     // 一个有key一个没有key的节点应该被认为是不同的
     expect(isSameVnode(node1, node5)).toBe(false);
+  });
+
+  // 添加针对组件虚拟节点的测试
+  it("应该能创建组件类型的虚拟节点", () => {
+    // 创建Vue实例
+    const vm = new Vue({
+      components: {
+        "custom-component": {
+          template: "<div>Custom Component</div>",
+        },
+      },
+    });
+
+    // 创建组件虚拟节点
+    const vnode = vm._c("custom-component", { id: "test-component" });
+
+    // 验证组件虚拟节点
+    expect(vnode.tag).toBe("custom-component");
+    expect(vnode.data.id).toBe("test-component");
+    expect(vnode.componentOptions).toBeDefined();
+    expect(vnode.componentOptions.Ctor).toBeDefined();
+  });
+
+  it("应该正确处理组件hook", () => {
+    // 注册全局组件
+    Vue.component("test-hook", {
+      template: "<div>Test Hook</div>",
+    });
+
+    // 创建Vue实例
+    const vm = new Vue({});
+
+    // 创建组件虚拟节点
+    const vnode = vm._c("test-hook");
+
+    // 验证组件hook
+    expect(vnode.data.hook).toBeDefined();
+    expect(typeof vnode.data.hook.init).toBe("function");
+  });
+
+  it("组件虚拟节点应该包含正确的构造函数", () => {
+    // 创建组件构造函数
+    const Component = Vue.extend({
+      template: "<div>Component</div>",
+    });
+
+    // 注册组件
+    Vue.component("test-constructor", Component);
+
+    // 创建Vue实例
+    const vm = new Vue({});
+
+    // 创建组件虚拟节点
+    const vnode = vm._c("test-constructor");
+
+    // 验证组件构造函数
+    expect(vnode.componentOptions.Ctor).toBe(Component);
   });
 });

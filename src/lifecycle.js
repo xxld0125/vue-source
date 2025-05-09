@@ -45,7 +45,11 @@ export function mountComponent(vm, el) {
   const updateComponent = () => {
     vm._update(vm._render());
   };
+
   new Watcher(vm, updateComponent, true);
+
+  // 挂载完成后调用mounted钩子
+  callHook(vm, "mounted");
 }
 
 // 调用钩子

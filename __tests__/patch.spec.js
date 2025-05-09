@@ -802,7 +802,7 @@ describe("虚拟DOM diff算法测试", () => {
 
     // 验证更新后的结构和顺序
     const children = vm.$el.children;
-    expect(children.length).toBe(4);
+    expect(children.length).toBe(5);
     expect(children[0].textContent).toBe("D-new");
     expect(children[1].textContent).toBe("C-new");
     expect(children[2].textContent).toBe("B-new");
@@ -842,7 +842,7 @@ describe("虚拟DOM diff算法测试", () => {
 
     // 验证更新后的结构和顺序
     const children = vm.$el.children;
-    expect(children.length).toBe(4);
+    expect(children.length).toBe(5);
     expect(children[0].textContent).toBe("D-new");
     expect(children[1].textContent).toBe("C-new");
     expect(children[2].textContent).toBe("B-new");

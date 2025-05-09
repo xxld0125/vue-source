@@ -22,7 +22,10 @@ export function initMixin(Vue) {
 
   Vue.prototype.$mount = function (el) {
     const vm = this;
-    el = document.querySelector(el);
+    // 修复el可能是DOM元素的情况
+    if (typeof el === "string") {
+      el = document.querySelector(el);
+    }
     let ops = vm.$options;
 
     if (!ops.render) {

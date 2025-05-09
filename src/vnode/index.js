@@ -28,6 +28,11 @@ function createComponentVNode(vm, tag, key, data, children, Ctor) {
     Ctor = vm.$options._base.extend(Ctor);
   }
 
+  // 确保data对象存在
+  if (!data) {
+    data = {};
+  }
+
   data.hook = {
     init(vnode) {
       // 保存组件的实例到虚拟节点上

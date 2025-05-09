@@ -2,7 +2,7 @@ import { isSameVnode } from "./index";
 
 function createComponent(vnode) {
   let i = vnode.data;
-  if ((i = i.hook) && (i = i.init)) {
+  if (i && (i = i.hook) && (i = i.init)) {
     i(vnode); // 初始化组件
   }
   if (vnode.componentInstance) {
@@ -12,8 +12,10 @@ function createComponent(vnode) {
 
 export function createElm(vnode) {
   const { tag, children, text, data } = vnode;
+
+  // 组件的处理
   if (typeof tag === "string") {
-    // 创建真实元素, 也要区分组件还是元素
+    // 创建真实元素，区分组件还是元素
     if (createComponent(vnode)) {
       return vnode.componentInstance.$el;
     }
@@ -37,6 +39,10 @@ export function createElm(vnode) {
 
 // 更新属性
 export function patchProps(el, oldProps = {}, props = {}) {
+  // 确保props和oldProps都存在
+  if (!props) props = {};
+  if (!oldProps) oldProps = {};
+
   let oldStyles = oldProps.style || {};
   let newStyles = props.style || {};
 
@@ -156,7 +162,9 @@ function updateChildren(el, oldChildren, newChildren) {
   function markIndexByKey(children) {
     let map = {};
     children.forEach((child, index) => {
-      map[child.key] = index;
+      if (child && child.key) {
+        map[child.key] = index;
+      }
     });
     return map;
   }
