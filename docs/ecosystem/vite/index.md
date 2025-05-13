@@ -12,9 +12,6 @@ Vite 是一个现代前端构建工具，提供极速的开发服务器和优化
 ## 学习路径
 
 - [架构概览](/ecosystem/vite/architecture) - 了解 Vite 的整体设计和核心模块
-- [开发服务器](/ecosystem/vite/dev-server) - 探索 Vite 开发服务器的实现原理
-- [HMR 实现](/ecosystem/vite/hmr) - 分析 Vite 的模块热替换机制
-- [构建流程](/ecosystem/vite/build-process) - 研究 Vite 的生产构建优化策略
 
 ## 为什么学习 Vite 源码？
 

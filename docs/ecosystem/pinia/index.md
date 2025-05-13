@@ -13,8 +13,6 @@ Pinia 是 Vue 的官方状态管理库，被视为 Vuex 的下一代替代品。
 ## 学习路径
 
 - [设计理念](/ecosystem/pinia/design) - 了解 Pinia 的设计思想和架构特点
-- [Store 实现](/ecosystem/pinia/store) - 探索 Store 的创建和状态管理实现
-- [与 Vue3 集成](/ecosystem/pinia/integration) - 分析 Pinia 如何与 Vue3 的响应式系统和组合式 API 集成
 
 ## 为什么学习 Pinia 源码？
 

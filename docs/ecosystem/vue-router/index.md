@@ -12,8 +12,6 @@ Vue Router 是 Vue.js 官方的路由管理器，它与 Vue.js 深度集成，�
 ## 学习路径
 
 - [路由实现原理](/ecosystem/vue-router/principles) - 了解 Vue Router 的整体设计和核心原理
-- [导航守卫](/ecosystem/vue-router/navigation-guards) - 分析导航守卫的执行流程和实现机制
-- [路由模式](/ecosystem/vue-router/modes) - 研究 Hash 模式和 History 模式的实现区别
 
 ## 为什么学习 Vue Router 源码？
 

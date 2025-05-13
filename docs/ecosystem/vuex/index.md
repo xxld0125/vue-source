@@ -13,8 +13,6 @@ Vuex 是一个专为 Vue.js 应用程序开发的状态管理模式+库。它采
 ## 学习路径
 
 - [状态管理原理](/ecosystem/vuex/principles) - 了解 Vuex 的设计理念和核心实现原理
-- [插件系统](/ecosystem/vuex/plugins) - 研究 Vuex 插件机制的实现方式
-- [模块化](/ecosystem/vuex/modules) - 分析 Vuex 模块系统的设计与实现
 
 ## 为什么学习 Vuex 源码？
 

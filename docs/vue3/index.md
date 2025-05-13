@@ -13,8 +13,6 @@ Vue3 是 Vue 框架的最新主要版本，相比 Vue2 有了重大的架构升�
 
 - [核心模块](/vue3/core-modules) - 了解 Vue3 的整体架构和核心模块设计
 - [响应式系统](/vue3/reactivity) - 深入分析基于 Proxy 的响应式系统实现
-- [组合式 API](/vue3/composition-api) - 探索组合式 API 的设计原理与实现方式
-- [渲染系统](/vue3/rendering-system) - 研究 Vue3 渲染系统的优化策略
 
 ## 为什么学习 Vue3 源码？
 
