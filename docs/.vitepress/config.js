@@ -4,39 +4,110 @@ import { withMermaid } from "vitepress-plugin-mermaid";
 export default withMermaid(
   defineConfig({
     base: "/vue2-source/", // 设置GitHub Pages的基本路径
-    title: "Vue2源码学习",
-    description: "Vue2源码实现与学习笔记",
+    title: "Vue生态源码学习",
+    description: "Vue生态源码实现与学习笔记",
     themeConfig: {
       nav: [
         { text: "首页", link: "/" },
-        { text: "核心模块", link: "/core-modules" },
-        { text: "开发进度", link: "/development-progress" },
-        { text: "流程图", link: "/flowcharts/" },
+        {
+          text: "Vue2",
+          items: [
+            { text: "核心模块", link: "/vue2/core-modules" },
+            { text: "开发进度", link: "/vue2/development-progress" },
+            { text: "流程图", link: "/vue2/flowcharts/" },
+          ],
+        },
+        {
+          text: "Vue3",
+          items: [
+            { text: "核心模块", link: "/vue3/core-modules" },
+            { text: "响应式系统", link: "/vue3/reactivity" },
+          ],
+        },
+        {
+          text: "生态",
+          items: [
+            { text: "Vite", link: "/ecosystem/vite/" },
+            { text: "Vue Router", link: "/ecosystem/vue-router/" },
+            { text: "Vuex", link: "/ecosystem/vuex/" },
+            { text: "Pinia", link: "/ecosystem/pinia/" },
+          ],
+        },
+        { text: "面试题", link: "/interview/" },
       ],
       sidebar: {
-        "/": [
+        "/vue2/": [
           {
-            text: "介绍",
-            items: [{ text: "首页", link: "/" }],
-          },
-          {
-            text: "核心文档",
+            text: "Vue2源码",
             items: [
-              { text: "核心模块", link: "/core-modules" },
-              { text: "开发进度", link: "/development-progress" },
+              { text: "核心模块", link: "/vue2/core-modules" },
+              { text: "开发进度", link: "/vue2/development-progress" },
             ],
           },
           {
             text: "流程图",
             items: [
-              { text: "概述", link: "/flowcharts/" },
-              { text: "响应式系统", link: "/flowcharts/reactive-system" },
+              { text: "概述", link: "/vue2/flowcharts/" },
+              { text: "响应式系统", link: "/vue2/flowcharts/reactive-system" },
               {
                 text: "计算属性实现",
-                link: "/flowcharts/computed-implementation",
+                link: "/vue2/flowcharts/computed-implementation",
               },
-              { text: "Diff算法", link: "/flowcharts/diff-algorithm" },
-              { text: "组件渲染", link: "/flowcharts/component-rendering" },
+              { text: "Diff算法", link: "/vue2/flowcharts/diff-algorithm" },
+              {
+                text: "组件渲染",
+                link: "/vue2/flowcharts/component-rendering",
+              },
+            ],
+          },
+        ],
+        "/vue3/": [
+          {
+            text: "Vue3源码",
+            items: [
+              { text: "核心模块", link: "/vue3/core-modules" },
+              { text: "响应式系统", link: "/vue3/reactivity" },
+            ],
+          },
+        ],
+        "/ecosystem/vite/": [
+          {
+            text: "Vite源码",
+            items: [{ text: "架构概览", link: "/ecosystem/vite/architecture" }],
+          },
+        ],
+        "/ecosystem/vue-router/": [
+          {
+            text: "Vue Router源码",
+            items: [
+              {
+                text: "路由实现原理",
+                link: "/ecosystem/vue-router/principles",
+              },
+            ],
+          },
+        ],
+        "/ecosystem/vuex/": [
+          {
+            text: "Vuex源码",
+            items: [
+              { text: "状态管理原理", link: "/ecosystem/vuex/principles" },
+            ],
+          },
+        ],
+        "/ecosystem/pinia/": [
+          {
+            text: "Pinia源码",
+            items: [{ text: "设计理念", link: "/ecosystem/pinia/design" }],
+          },
+        ],
+        "/interview/": [
+          {
+            text: "面试题解析",
+            items: [
+              { text: "Vue2面试题", link: "/interview/vue2" },
+              { text: "Vue3面试题", link: "/interview/vue3" },
+              { text: "生态面试题", link: "/interview/ecosystem" },
             ],
           },
         ],
