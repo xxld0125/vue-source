@@ -12,6 +12,7 @@ title: Vue2源码实现流程图
 - [计算属性实现](/vue2/flowcharts/computed-implementation) - 计算属性的工作原理
 - [Diff 算法](/vue2/flowcharts/diff-algorithm) - 虚拟 DOM 比对算法的流程
 - [组件渲染](/vue2/flowcharts/component-rendering) - 组件的渲染和更新流程
+- [keep-alive 组件缓存与重新渲染](/vue2/flowcharts/keep-alive-component-rerendering) - keep-alive 组件的缓存机制和重新渲染流程
 
 ## 什么是流程图
 
@@ -34,6 +35,7 @@ title: Vue2源码实现流程图
 - [计算属性实现原理](./computed-implementation.md) - 解析计算属性的依赖收集与缓存机制
 - [Diff 算法实现原理](./diff-algorithm.md) - 详细说明虚拟 DOM 比对算法的优化策略
 - [组件渲染实现原理](./component-rendering.md) - 深入剖析组件的创建、挂载与更新流程
+- [keep-alive 组件缓存与重新渲染流程](./keep-alive-component-rerendering.md) - 深入理解 keep-alive 组件的缓存机制与组件重新渲染过程
 
 每个流程图都包含详细的解释和关键概念，帮助你深入理解 Vue2 源码实现的精妙之处。
 
@@ -43,6 +45,7 @@ title: Vue2源码实现流程图
 - [计算属性实现流程](./computed-implementation.md) - 计算属性(computed)的实现流程
 - [Diff 算法实现流程](./diff-algorithm.md) - 虚拟 DOM 的 diff 算法实现流程
 - [组件渲染实现流程](./component-rendering.md) - 组件的创建、挂载与更新流程
+- [keep-alive 组件缓存与重新渲染流程](./keep-alive-component-rerendering.md) - keep-alive 组件的缓存机制与重新渲染流程
 - 更多流程图将陆续添加...
 
 ## 流程图说明

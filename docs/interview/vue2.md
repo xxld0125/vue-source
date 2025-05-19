@@ -114,7 +114,88 @@ function render() {
 - 用来标识组件，通过 `name` 来找到对应的组件，自己封装跨级通信。
 - `name` 属性可以用作 `devtools` 调试工具中标明具体的组件。
 
-## 15.
+## 15.`Vue`中的 `slot` 如何实现的？什么时候使用它?
+
+插槽的类型：
+
+- 普通插槽：插槽渲染作用域在父组件中
+  - 在解析组件的时候会将组件的 `children` 放到 `componentOptions` 上作为虚拟节点的属性
+  - 将 `children` 取出来放到组件的 `vm.$options.` 中
+  - 做出一个映射表放到 `vm.$slots` 上 -> 将结果放到 `vm.$scopeSlots` (`vm.$scopeSlots = { a: fn, b: fn, default: fn }`)
+  - 渲染组件时调用 `_t` ，此时会在 `vm.$scopeSlots` 找到对应的函数渲染内容。
+- 具名插槽：相比与普通插槽，支持自定义名称(默认插槽名称为 `default` )
+- 作用于插槽：插槽**渲染作用域在子组件中**
+  - 渲染插槽选择的作用于是子组件的。作用于插槽渲染是不会作为 `children` , 将作用于插槽做成了一个属性 `scopeSlots`
+  - `scopeSlots` 是一个映射关系 `$scopeSlots = { default: fn }`
+  - 稍后渲染组件模版的时候，会通过 `name` 找到对应的函数，将数据传入到函数中此时才渲染虚拟节点，再用这个虚拟节点替换
+
+**其中 `$slots` 和 `$scopeSlots` 都是维护的映射关系，其中 `$slots` 维护的是键与对应的虚拟 DOM， `$scoptSlots` 维护的是键与对应函数**
+
+## 16.`keep-alive`平时在哪使用？原理是？
+
+使用场景：
+
+- `keep-alive` 在路由中使用
+- 在 `component:is` 中使用(缓存)
+
+原理:
+
+- `keep-alive` 的原理是默认缓存加载过的组件实例，内部采用了 `LRU` 算法
+- 下次组件加载时会找到对应缓存的节点来进行初始化，不会再将虚拟节点转换成真实节点，而是直接采用缓存的 `$el` 进行挂载
+- 更新和销毁会触发 `activated` 和 `deactived` 钩子
+
+## 17.如何理解自定义指令
+
+自定义指令就是用户对应好对应的钩子(`insert`, `update`, `unbind`)，当元素在不同状态时会调用对应的钩子(所有的钩子会被合并到不同方法的 `cbs` 上，到时候会依次调用)。
+
+## 18.`Vue`事件修饰符有哪些？其实现原理是什么？
+
+### 常见事件修饰符
+
+- `.stop`：调用 event.stopPropagation() 阻止事件冒泡
+- `.prevent`：调用 event.preventDefault() 阻止默认行为
+- `.capture`：添加事件监听时使用捕获模式
+- `.self`：只在事件从自身元素触发时才触发回调
+- `.once`：事件只触发一次，回调执行后移除监听器
+- `.passive`：以 passive 方式绑定监听器，提升滚动性能
+
+### 实现原理
+
+1. **编译阶段**：
+
+   - Vue 在解析模板时，会识别事件修饰符，将其解析为特定的标记，生成 render 函数时将修饰符信息一同传递。
+   - 例如：`@click.stop` 会被编译为 `{ on: { click: function($event){ $event.stopPropagation(); return handler($event) } } }`
+
+2. **渲染函数生成**：
+
+   - 渲染函数会根据修饰符生成不同的事件处理函数包装代码。
+   - 多个修饰符会按顺序嵌套处理。
+
+3. **运行时处理**：
+
+   - Vue 在 patch 阶段为 VNode 绑定事件时，会根据修饰符生成的包装函数注册事件。
+   - 部分修饰符（如 once、capture、passive）会通过 addEventListener 的第三个参数实现。
+   - 其他修饰符（如 stop、prevent、self）则通过包装函数在事件回调中手动处理。
+
+#### 伪代码示例
+
+```js
+// 编译后生成的事件处理函数示例
+function($event) {
+  $event.stopPropagation(); // .stop
+  $event.preventDefault(); // .prevent
+  return handler($event);
+}
+
+// once、capture、passive 通过如下方式注册
+el.addEventListener('click', handler, { once: true, capture: true, passive: true })
+```
+
+### 优势与注意事项
+
+- 事件修饰符让模板更简洁，避免手动在回调中处理事件对象。
+- 某些修饰符（如 passive）需注意浏览器兼容性。
+- 修饰符顺序会影响事件行为，需合理组合。
 
 ## 高级原理
 

@@ -58,6 +58,10 @@ export default withMermaid(
                 text: "组件渲染",
                 link: "/vue2/flowcharts/component-rendering",
               },
+              {
+                text: "keep-alive组件缓存",
+                link: "/vue2/flowcharts/keep-alive-component-rerendering",
+              },
             ],
           },
         ],
